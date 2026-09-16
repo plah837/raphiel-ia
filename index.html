@@ -94,6 +94,7 @@
       from {
         transform: scale(0.98);
       }
+
       to {
         transform: scale(1.04);
       }
@@ -118,6 +119,7 @@
       font-size: clamp(1.3rem, 5vw, 2rem);
       line-height: 1.45;
       text-align: left;
+      white-space: pre-wrap;
     }
 
     .input-area {
@@ -152,6 +154,11 @@
       color: white;
       font-size: 1.4rem;
       background: linear-gradient(135deg, #087fa5, #4d50b9);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
     }
 
     button:active {
@@ -249,13 +256,13 @@
         autocomplete="off"
       >
 
-      <button id="sendButton" aria-label="Enviar pergunta">
+      <button id="sendButton" type="button" aria-label="Enviar pergunta">
         ➤
       </button>
     </div>
 
     <div class="voice-area">
-      <button id="voiceButton" aria-label="Falar com Raphael">
+      <button id="voiceButton" type="button" aria-label="Falar com Raphael">
         🎙️
       </button>
 
@@ -272,9 +279,13 @@
     const answer = document.getElementById("answer");
     const statusText = document.getElementById("status");
 
+    const WORKER_URL =
+      "https://raphiel-ia.luiz2027rocha.workers.dev/api/chat";
+
     function speak(text) {
       if (!("speechSynthesis" in window)) {
-        statusText.textContent = "A voz não é suportada neste navegador.";
+        statusText.textContent =
+          "A voz não é suportada neste navegador.";
         return;
       }
 
@@ -289,53 +300,62 @@
       window.speechSynthesis.speak(voice);
     }
 
-    function generateAnswer(question) {
-      const text = question.toLowerCase();
-
-      if (text.includes("oi") || text.includes("olá")) {
-        return "Olá! Eu sou Raphael Tensura. Estou pronto para ajudar você.";
-      }
-
-      if (text.includes("seu nome")) {
-        return "Meu nome é Raphael Tensura, seu sistema de análise e assistência.";
-      }
-
-      if (text.includes("quem é você")) {
-        return "Eu sou Raphael Tensura, uma assistente virtual criada para conversar e ajudar.";
-      }
-
-      if (text.includes("hora")) {
-        return "Agora são " + new Date().toLocaleTimeString("pt-BR") + ".";
-      }
-
-      if (text.includes("obrigado") || text.includes("valeu")) {
-        return "De nada. Estou sempre à disposição.";
-      }
-
-      return "Entendi sua pergunta: " + question +
-        ". Ainda estou aprendendo, mas posso ajudar com ideias, explicações e informações.";
-    }
-
-    function sendQuestion() {
+    async function sendQuestion() {
       const question = questionInput.value.trim();
 
       if (!question) {
-        answer.textContent = "Digite uma pergunta para Raphael Tensura.";
+        answer.textContent =
+          "Digite uma pergunta para Raphael Tensura.";
         return;
       }
 
       answer.textContent = "Analisando sua pergunta...";
       statusText.textContent = "Raphael está processando...";
+      sendButton.disabled = true;
 
-      setTimeout(function() {
-        const response = generateAnswer(question);
+      try {
+        const response = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: question
+          })
+        });
 
-        answer.textContent = response;
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.erro ||
+            data.error ||
+            "O Worker retornou um erro."
+          );
+        }
+
+        const resposta = data.reply;
+
+        if (!resposta) {
+          throw new Error("A resposta da IA veio vazia.");
+        }
+
+        answer.textContent = resposta;
         statusText.textContent = "Resposta pronta";
-        speak(response);
-      }, 500);
+        speak(resposta);
 
-      questionInput.value = "";
+      } catch (error) {
+        console.error("Erro ao chamar o Worker:", error);
+
+        answer.textContent =
+          "Não consegui conectar com a inteligência artificial.";
+
+        statusText.textContent =
+          "Verifique o Worker e tente novamente.";
+      } finally {
+        sendButton.disabled = false;
+        questionInput.value = "";
+      }
     }
 
     sendButton.addEventListener("click", sendQuestion);
@@ -370,12 +390,15 @@
         voiceButton.classList.remove("listening");
 
         if (statusText.textContent === "Estou ouvindo...") {
-          statusText.textContent = "Toque no microfone para falar";
+          statusText.textContent =
+            "Toque no microfone para falar";
         }
       };
 
       recognition.onresult = function(event) {
-        const spokenText = event.results[0][0].transcript;
+        const spokenText =
+          event.results[0][0].transcript;
+
         questionInput.value = spokenText;
         sendQuestion();
       };
@@ -383,7 +406,8 @@
       recognition.onerror = function() {
         listening = false;
         voiceButton.classList.remove("listening");
-        statusText.textContent = "Não consegui entender. Tente novamente.";
+        statusText.textContent =
+          "Não consegui entender. Tente novamente.";
       };
 
       voiceButton.addEventListener("click", function() {
@@ -401,4 +425,4 @@
     }
   </script>
 </body>
-</html>
+        </html>
