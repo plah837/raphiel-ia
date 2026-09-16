@@ -1,73 +1,404 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Raphael Tensura</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="app-shell">
-      <header class="topbar">
-        <div class="home-btn" aria-label="Home">
-          <span>⌂</span>
-        </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050b12">
+  <title>Raphael Tensura</title>
 
-        <div class="address-bar">
-          <span class="lock">◌</span>
-          <span>plah837.github.io/raphi</span>
-        </div>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-        <div class="menu-btn">⋮</div>
-      </header>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 50% 35%, #102d3d 0%, #06121c 28%, #03070c 65%);
+      color: white;
+      font-family: Arial, sans-serif;
+    }
 
-      <main class="content">
-        <h1 class="title">RAPHAEL TENSURA</h1>
-        <p class="subtitle">Sistema de análise pronto</p>
+    .app {
+      width: 100%;
+      max-width: 700px;
+      min-height: 100vh;
+      margin: auto;
+      padding: 35px 22px 30px;
+      text-align: center;
+    }
 
-        <div class="orb-wrap">
-          <div class="orb-ring outer"></div>
-          <div class="orb-ring inner"></div>
-          <div class="orb-core"></div>
-        </div>
+    h1 {
+      margin: 10px 0 8px;
+      font-size: clamp(2rem, 8vw, 4rem);
+      letter-spacing: 0.14em;
+      font-weight: 400;
+    }
 
-        <div class="bubble assistant-bubble">
-          <p id="assistantText">Olá! Eu sou Raphael Tensura. Como posso ajudar?</p>
-        </div>
+    .subtitle {
+      margin: 0 0 35px;
+      color: #65dcff;
+      font-size: clamp(1.1rem, 4vw, 1.7rem);
+    }
 
-        <div class="input-panel">
-          <div class="input-row">
-            <input
-              id="messageInput"
-              type="text"
-              placeholder="Digite sua pergunta..."
-              aria-label="Digite sua pergunta"
-            />
+    .orb {
+      width: 250px;
+      height: 250px;
+      margin: 0 auto 35px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-            <button id="voiceBtn" class="icon-btn voice-btn" aria-label="Ativar microfone">
-              ◉
-            </button>
+    .outer-ring,
+    .inner-ring {
+      position: absolute;
+      border-radius: 50%;
+    }
 
-            <button id="sendBtn" class="send-btn" aria-label="Enviar">
-              ▸
-            </button>
-          </div>
+    .outer-ring {
+      width: 250px;
+      height: 250px;
+      border: 4px solid #36d9ff;
+      box-shadow:
+        0 0 15px #36d9ff,
+        0 0 45px #1684a8,
+        inset 0 0 25px #1684a8;
+      animation: pulse 2.5s infinite alternate;
+    }
 
-          <div class="controls">
-            <button id="microBtn" class="micro-btn" aria-label="Microfone">
-              ◍
-            </button>
-          </div>
-        </div>
-      </main>
+    .inner-ring {
+      width: 185px;
+      height: 185px;
+      border: 4px solid #8a7cff;
+      box-shadow:
+        0 0 15px #8a7cff,
+        0 0 35px #5148a5,
+        inset 0 0 20px #5148a5;
+    }
+
+    .core {
+      width: 105px;
+      height: 105px;
+      border-radius: 50%;
+      background: white;
+      box-shadow:
+        0 0 20px white,
+        0 0 45px #c6f4ff;
+      z-index: 2;
+    }
+
+    @keyframes pulse {
+      from {
+        transform: scale(0.98);
+      }
+      to {
+        transform: scale(1.04);
+      }
+    }
+
+    .message-box {
+      min-height: 170px;
+      padding: 28px 24px;
+      border: 1px solid #1e465c;
+      border-radius: 24px;
+      background: rgba(5, 15, 25, 0.88);
+      box-shadow: 0 0 25px rgba(0, 155, 220, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #answer {
+      margin: 0;
+      width: 100%;
+      color: #f2f7fa;
+      font-size: clamp(1.3rem, 5vw, 2rem);
+      line-height: 1.45;
+      text-align: left;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    #question {
+      flex: 1;
+      min-width: 0;
+      height: 58px;
+      padding: 0 18px;
+      border: 1px solid #244355;
+      border-radius: 16px;
+      outline: none;
+      background: #08131e;
+      color: white;
+      font-size: 1rem;
+    }
+
+    #question::placeholder {
+      color: #71808b;
+    }
+
+    button {
+      height: 58px;
+      border: 0;
+      border-radius: 16px;
+      padding: 0 18px;
+      cursor: pointer;
+      color: white;
+      font-size: 1.4rem;
+      background: linear-gradient(135deg, #087fa5, #4d50b9);
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    .voice-area {
+      margin-top: 20px;
+    }
+
+    #voiceButton {
+      width: 70px;
+      height: 70px;
+      padding: 0;
+      border-radius: 50%;
+      border: 1px solid #31566a;
+      background: #091722;
+      font-size: 2rem;
+    }
+
+    #voiceButton.listening {
+      background: #087fa5;
+      box-shadow: 0 0 25px #36d9ff;
+    }
+
+    .status {
+      min-height: 22px;
+      margin-top: 12px;
+      color: #7bdfff;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 450px) {
+      .app {
+        padding: 28px 15px;
+      }
+
+      .orb {
+        width: 210px;
+        height: 210px;
+      }
+
+      .outer-ring {
+        width: 210px;
+        height: 210px;
+      }
+
+      .inner-ring {
+        width: 155px;
+        height: 155px;
+      }
+
+      .core {
+        width: 85px;
+        height: 85px;
+      }
+
+      .input-area {
+        gap: 6px;
+      }
+
+      #question {
+        font-size: 0.95rem;
+      }
+
+      .input-area button {
+        padding: 0 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <h1>RAPHAEL TENSURA</h1>
+    <p class="subtitle">Sistema de análise pronto</p>
+
+    <div class="orb">
+      <div class="outer-ring"></div>
+      <div class="inner-ring"></div>
+      <div class="core"></div>
     </div>
 
-    <script src="app.js"></script>
-  </body>
-  </html>
+    <section class="message-box">
+      <p id="answer">
+        Olá! Eu sou Raphael Tensura. Como posso ajudar?
+      </p>
+    </section>
+
+    <div class="input-area">
+      <input
+        id="question"
+        type="text"
+        placeholder="Digite sua pergunta..."
+        autocomplete="off"
+      >
+
+      <button id="sendButton" aria-label="Enviar pergunta">
+        ➤
+      </button>
+    </div>
+
+    <div class="voice-area">
+      <button id="voiceButton" aria-label="Falar com Raphael">
+        🎙️
+      </button>
+
+      <div id="status" class="status">
+        Toque no microfone para falar
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const questionInput = document.getElementById("question");
+    const sendButton = document.getElementById("sendButton");
+    const voiceButton = document.getElementById("voiceButton");
+    const answer = document.getElementById("answer");
+    const statusText = document.getElementById("status");
+
+    function speak(text) {
+      if (!("speechSynthesis" in window)) {
+        statusText.textContent = "A voz não é suportada neste navegador.";
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      const voice = new SpeechSynthesisUtterance(text);
+      voice.lang = "pt-BR";
+      voice.rate = 1;
+      voice.pitch = 1.05;
+      voice.volume = 1;
+
+      window.speechSynthesis.speak(voice);
+    }
+
+    function generateAnswer(question) {
+      const text = question.toLowerCase();
+
+      if (text.includes("oi") || text.includes("olá")) {
+        return "Olá! Eu sou Raphael Tensura. Estou pronto para ajudar você.";
+      }
+
+      if (text.includes("seu nome")) {
+        return "Meu nome é Raphael Tensura, seu sistema de análise e assistência.";
+      }
+
+      if (text.includes("quem é você")) {
+        return "Eu sou Raphael Tensura, uma assistente virtual criada para conversar e ajudar.";
+      }
+
+      if (text.includes("hora")) {
+        return "Agora são " + new Date().toLocaleTimeString("pt-BR") + ".";
+      }
+
+      if (text.includes("obrigado") || text.includes("valeu")) {
+        return "De nada. Estou sempre à disposição.";
+      }
+
+      return "Entendi sua pergunta: " + question +
+        ". Ainda estou aprendendo, mas posso ajudar com ideias, explicações e informações.";
+    }
+
+    function sendQuestion() {
+      const question = questionInput.value.trim();
+
+      if (!question) {
+        answer.textContent = "Digite uma pergunta para Raphael Tensura.";
+        return;
+      }
+
+      answer.textContent = "Analisando sua pergunta...";
+      statusText.textContent = "Raphael está processando...";
+
+      setTimeout(function() {
+        const response = generateAnswer(question);
+
+        answer.textContent = response;
+        statusText.textContent = "Resposta pronta";
+        speak(response);
+      }, 500);
+
+      questionInput.value = "";
+    }
+
+    sendButton.addEventListener("click", sendQuestion);
+
+    questionInput.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        sendQuestion();
+      }
+    });
+
+    const SpeechRecognition =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
+
+    let recognition = null;
+    let listening = false;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = "pt-BR";
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = function() {
+        listening = true;
+        voiceButton.classList.add("listening");
+        statusText.textContent = "Estou ouvindo...";
+      };
+
+      recognition.onend = function() {
+        listening = false;
+        voiceButton.classList.remove("listening");
+
+        if (statusText.textContent === "Estou ouvindo...") {
+          statusText.textContent = "Toque no microfone para falar";
+        }
+      };
+
+      recognition.onresult = function(event) {
+        const spokenText = event.results[0][0].transcript;
+        questionInput.value = spokenText;
+        sendQuestion();
+      };
+
+      recognition.onerror = function() {
+        listening = false;
+        voiceButton.classList.remove("listening");
+        statusText.textContent = "Não consegui entender. Tente novamente.";
+      };
+
+      voiceButton.addEventListener("click", function() {
+        if (listening) {
+          recognition.stop();
+        } else {
+          recognition.start();
+        }
+      });
+    } else {
+      voiceButton.addEventListener("click", function() {
+        statusText.textContent =
+          "Seu navegador não oferece reconhecimento de voz.";
+      });
+    }
+  </script>
+</body>
+</html>
