@@ -1,10 +1,20 @@
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Content-Type": "application/json; charset=UTF-8"
+};
+
+function respostaJSON(dados, status = 200) {
+  return new Response(JSON.stringify(dados), {
+    status,
+    headers: corsHeaders
+  });
+}
+
 export default {
   async fetch(request, env) {
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization"
-    };
+    const url = new URL(request.url);
 
     if (request.method === "OPTIONS") {
       return new Response(null, {
@@ -13,84 +23,96 @@ export default {
       });
     }
 
-    if (request.method !== "POST") {
-      return new Response(JSON.stringify({ error: "Método não permitido" }), {
-        status: 405,
-        headers: {
-          "Content-Type": "application/json",
-          ...corsHeaders
-        }
+    if (url.pathname === "/api/health" && request.method === "GET") {
+      return respostaJSON({
+        online: true,
+        nome: "Raphael Tensura",
+        mensagem: "API funcionando"
       });
     }
 
-    try {
-      const body = await request.json();
-      const prompt = body.message || "";
+    if (url.pathname === "/api/chat" && request.method === "POST") {
+      try {
+        if (!env.OPENAI_API_KEY) {
+          return respostaJSON(
+            { erro: "A chave OPENAI_API_KEY não foi configurada no Cloudflare." },
+            500
+          );
+        }
 
-      if (!prompt || !prompt.trim()) {
-        return new Response(JSON.stringify({ error: "Mensagem vazia" }), {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json",
-            ...corsHeaders
-          }
-        });
-      }
+        const corpo = await request.json();
+        const mensagem = String(corpo.message || "").trim();
 
-      const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${env.OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "system",
-              content: "Você é Raphael Tensura, uma IA amigável, direta e útil. Responda em português do Brasil."
+        if (!mensagem) {
+          return respostaJSON(
+            { erro: "A mensagem está vazia." },
+            400
+          );
+        }
+
+        const respostaOpenAI = await fetch(
+          "https://api.openai.com/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${env.OPENAI_API_KEY}`
             },
-            {
-              role: "user",
-              content: prompt
-            }
-          ],
-          temperature: 0.7
-        })
-      });
-
-      const result = await openaiResponse.json();
-
-      if (!openaiResponse.ok) {
-        return new Response(JSON.stringify({
-          error: result.error?.message || "Erro na API da OpenAI"
-        }), {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json",
-            ...corsHeaders
+            body: JSON.stringify({
+              model: "gpt-4o-mini",
+              messages: [
+                {
+                  role: "system",
+                  content:
+                    "Você é Raphael Tensura. Responda sempre em português do Brasil, de forma clara, educada, útil e direta."
+                },
+                {
+                  role: "user",
+                  content: mensagem
+                }
+              ],
+              temperature: 0.7,
+              max_tokens: 700
+            })
           }
+        );
+
+        const resultado = await respostaOpenAI.json();
+
+        if (!respostaOpenAI.ok) {
+          return respostaJSON(
+            {
+              erro:
+                resultado?.error?.message ||
+                "A OpenAI recusou a solicitação."
+            },
+            respostaOpenAI.status
+          );
+        }
+
+        const resposta =
+          resultado?.choices?.[0]?.message?.content ||
+          "Não consegui gerar uma resposta.";
+
+        return respostaJSON({
+          ok: true,
+          reply: resposta
         });
+      } catch (erro) {
+        return respostaJSON(
+          {
+            erro: "Erro interno ao conversar com a IA."
+          },
+          500
+        );
       }
-
-      const reply = result.choices?.[0]?.message?.content || "Sem resposta";
-
-      return new Response(JSON.stringify({ reply }), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          ...corsHeaders
-        }
-      });
-
-    } catch (error) {
-      return new Response(JSON.stringify({ error: "Erro interno do servidor" }), {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-          ...corsHeaders
-        }
-      });
     }
+
+    return respostaJSON(
+      {
+        erro: "Rota não encontrada."
+      },
+      404
+    );
   }
 };
