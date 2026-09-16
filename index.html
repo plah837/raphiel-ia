@@ -1,139 +1,73 @@
-export default {
-  async fetch(request, env) {
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type"
-    };
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Raphael Tensura</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="home-btn" aria-label="Home">
+          <span>⌂</span>
+        </div>
 
-    // Permite as requisições OPTIONS
-    if (request.method === "OPTIONS") {
-      return new Response(null, {
-        status: 204,
-        headers: corsHeaders
-      });
-    }
+        <div class="address-bar">
+          <span class="lock">◌</span>
+          <span>plah837.github.io/raphi</span>
+        </div>
 
-    const url = new URL(request.url);
+        <div class="menu-btn">⋮</div>
+      </header>
 
-    // =====================================================
-    // SITE
-    // =====================================================
-    // Quando abrir o endereço principal, entrega o index.html
-    if (
-      (request.method === "GET" || request.method === "HEAD") &&
-      (url.pathname === "/" || !url.pathname.startsWith("/api"))
-    ) {
-      if (env.ASSETS) {
-        return env.ASSETS.fetch(request);
-      }
+      <main class="content">
+        <h1 class="title">RAPHAEL TENSURA</h1>
+        <p class="subtitle">Sistema de análise pronto</p>
 
-      return new Response(
-        "Erro: o armazenamento de arquivos (ASSETS) não está configurado.",
-        {
-          status: 500,
-          headers: {
-            "Content-Type": "text/plain; charset=UTF-8",
-            ...corsHeaders
-          }
-        }
-      );
-    }
+        <div class="orb-wrap">
+          <div class="orb-ring outer"></div>
+          <div class="orb-ring inner"></div>
+          <div class="orb-core"></div>
+        </div>
 
-    // =====================================================
-    // API DO RAPHAEL TENSEI
-    // =====================================================
-    if (url.pathname === "/api" || url.pathname === "/api/chat") {
-      
-      if (request.method === "GET") {
-        return new Response(
-          JSON.stringify({
-            reply: "Raphael Tensei online."
-          }),
-          {
-            status: 200,
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-              ...corsHeaders
-            }
-          }
-        );
-      }
+        <div class="bubble assistant-bubble">
+          <p id="assistantText">Olá! Eu sou Raphael Tensura. Como posso ajudar?</p>
+        </div>
 
-      if (request.method === "POST") {
-        try {
-          const data = await request.json();
+        <div class="input-panel">
+          <div class="input-row">
+            <input
+              id="messageInput"
+              type="text"
+              placeholder="Digite sua pergunta..."
+              aria-label="Digite sua pergunta"
+            />
 
-          const pergunta =
-            data.message ||
-            data.question ||
-            data.prompt ||
-            "";
+            <button id="voiceBtn" class="icon-btn voice-btn" aria-label="Ativar microfone">
+              ◉
+            </button>
 
-          if (!pergunta.trim()) {
-            return new Response(
-              JSON.stringify({
-                reply: "Digite uma pergunta."
-              }),
-              {
-                status: 400,
-                headers: {
-                  "Content-Type": "application/json; charset=UTF-8",
-                  ...corsHeaders
-                }
-              }
-            );
-          }
+            <button id="sendBtn" class="send-btn" aria-label="Enviar">
+              ▸
+            </button>
+          </div>
 
-          // Resposta básica do Raphael Tensei
-          const resposta =
-            "Olá. Eu sou Raphael Tensei. Recebi sua mensagem: " +
-            pergunta;
+          <div class="controls">
+            <button id="microBtn" class="micro-btn" aria-label="Microfone">
+              ◍
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
 
-          return new Response(
-            JSON.stringify({
-              reply: resposta
-            }),
-            {
-              status: 200,
-              headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-                ...corsHeaders
-              }
-            }
-          );
-
-        } catch (error) {
-          return new Response(
-            JSON.stringify({
-              reply: "Não consegui processar sua mensagem."
-            }),
-            {
-              status: 400,
-              headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-                ...corsHeaders
-              }
-            }
-          );
-        }
-      }
-    }
-
-    // =====================================================
-    // ROTA NÃO ENCONTRADA
-    // =====================================================
-    return new Response(
-      JSON.stringify({
-        error: "Rota não encontrada."
-      }),
-      {
-        status: 404,
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-          ...corsHeaders
-        }
-      }
-    );
-  }
-};
+    <script src="app.js"></script>
+  </body>
+  </html>
