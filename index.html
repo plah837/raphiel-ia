@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>RAPHAEL TENSEI</title>
 
   <style>
@@ -11,82 +10,91 @@
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at center, #17102d 0%, #090711 45%, #030307 100%);
-      color: white;
-      font-family: Arial, Helvetica, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
     }
 
-    .app {
-      width: 100%;
-      max-width: 650px;
-      text-align: center;
+    body {
+      min-height: 100vh;
+      background: #03030a;
+      color: white;
+      font-family: Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 45px 16px 30px;
+      background:
+        radial-gradient(
+          circle at 50% 25%,
+          rgba(93, 42, 180, 0.25),
+          transparent 35%
+        );
     }
 
     /* ESFERA */
-    .sphere {
-      width: 190px;
-      height: 190px;
-      margin: 0 auto 28px;
+    .orb {
+      width: 180px;
+      height: 180px;
       border-radius: 50%;
       position: relative;
+      margin: 15px auto 35px;
 
       background:
         radial-gradient(
-          circle,
+          circle at 50% 50%,
           #ffffff 0%,
-          #ffffff 7%,
-          #c8b8ff 13%,
-          #8c5cff 25%,
-          #4d19b8 43%,
-          #17063e 67%,
-          transparent 70%
+          #ffffff 8%,
+          #d7c8ff 14%,
+          #9b68ff 25%,
+          #5d24d6 43%,
+          #21075c 63%,
+          #080312 72%
         );
 
       box-shadow:
-        0 0 15px #ffffff,
-        0 0 35px #a96cff,
-        0 0 70px #643cff,
-        0 0 110px #1d8cff;
+        0 0 15px #fff,
+        0 0 30px #a66cff,
+        0 0 55px #713cff,
+        0 0 90px rgba(0, 180, 255, 0.8);
 
-      animation: pulse 3s ease-in-out infinite;
+      animation: brilho 3s infinite ease-in-out;
     }
 
-    .sphere::before {
+    .orb::before {
       content: "";
       position: absolute;
-      inset: -14px;
+      inset: -13px;
       border-radius: 50%;
       border: 5px solid #00d9ff;
 
       box-shadow:
-        0 0 10px #00d9ff,
-        0 0 25px #008cff,
-        inset 0 0 20px #00d9ff;
-
-      opacity: 0.95;
+        0 0 12px #00d9ff,
+        0 0 30px #008cff,
+        inset 0 0 15px #00d9ff;
     }
 
-    .sphere::after {
+    .orb::after {
       content: "";
       position: absolute;
-      inset: 18px;
+      inset: 17px;
       border-radius: 50%;
-      border: 3px solid #b86cff;
+      border: 3px solid #b46cff;
 
       box-shadow:
-        0 0 15px #b86cff,
-        inset 0 0 18px #8c42ff;
+        0 0 12px #b46cff,
+        inset 0 0 15px #9a4dff;
     }
 
-    @keyframes pulse {
+    @keyframes brilho {
       0%, 100% {
         transform: scale(1);
       }
@@ -98,26 +106,324 @@
 
     h1 {
       margin: 0;
-      font-size: 32px;
+      text-align: center;
+      font-size: 30px;
       letter-spacing: 5px;
-      font-weight: 700;
       text-shadow:
-        0 0 10px #ffffff,
-        0 0 25px #9b5cff;
+        0 0 8px white,
+        0 0 20px #914cff;
     }
 
     .subtitle {
-      margin: 10px 0 25px;
-      color: #b9b1d0;
+      margin-top: 10px;
+      color: #bcb6cc;
+      text-align: center;
       font-size: 15px;
     }
 
-    .status {
-      display: inline-flex;
+    .online {
+      margin-top: 20px;
+      display: flex;
       align-items: center;
       gap: 8px;
       padding: 8px 14px;
       border-radius: 20px;
-      background: rgba(0, 255, 180, 0.08);
-      border: 1px solid rgba(0, 255, 180, 0.3);
-      color: #70ffc
+      border: 1px solid rgba(0, 255, 170, 0.3);
+      background: rgba(0, 255, 170, 0.06);
+      color: #72ffd0;
+      font-size: 13px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #00ffad;
+      box-shadow: 0 0 10px #00ffad;
+    }
+
+    .chat {
+      width: 100%;
+      max-width: 650px;
+      margin-top: 25px;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(12, 10, 25, 0.92);
+      border: 1px solid rgba(140, 80, 255, 0.35);
+      box-shadow: 0 0 30px rgba(100, 40, 200, 0.18);
+    }
+
+    #messages {
+      width: 100%;
+      height: 260px;
+      overflow-y: auto;
+      padding: 5px;
+      margin-bottom: 15px;
+    }
+
+    .message {
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .raphael {
+      background: rgba(120, 60, 230, 0.12);
+      border: 1px solid rgba(150, 100, 255, 0.2);
+    }
+
+    .user {
+      background: rgba(0, 170, 255, 0.1);
+      border: 1px solid rgba(0, 170, 255, 0.2);
+    }
+
+    .name {
+      font-size: 11px;
+      opacity: 0.6;
+      margin-bottom: 5px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    #message {
+      flex: 1;
+      min-width: 0;
+      padding: 14px;
+      border-radius: 12px;
+      outline: none;
+      border: 1px solid rgba(150, 100, 255, 0.35);
+      background: #07070e;
+      color: white;
+      font-size: 15px;
+    }
+
+    #message:focus {
+      border-color: #9d5cff;
+      box-shadow: 0 0 15px rgba(150, 80, 255, 0.2);
+    }
+
+    #send {
+      border: 0;
+      border-radius: 12px;
+      padding: 0 22px;
+      background: linear-gradient(135deg, #713cff, #a855f7);
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #send:disabled {
+      opacity: 0.5;
+    }
+
+    #voice {
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 210, 255, 0.3);
+      background: rgba(0, 150, 255, 0.08);
+      color: #8deaff;
+      cursor: pointer;
+    }
+
+    @media (max-width: 500px) {
+      .orb {
+        width: 145px;
+        height: 145px;
+      }
+
+      h1 {
+        font-size: 23px;
+        letter-spacing: 3px;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      #send {
+        height: 48px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="page">
+
+    <div class="orb"></div>
+
+    <h1>RAPHAEL TENSEI</h1>
+
+    <div class="subtitle">
+      Sistema de análise pronto
+    </div>
+
+    <div class="online">
+      <span class="dot"></span>
+      Sistema online
+    </div>
+
+    <div class="chat">
+
+      <div id="messages">
+
+        <div class="message raphael">
+          <div class="name">RAPHAEL TENSEI</div>
+          Olá. Eu sou Raphael. Como posso ajudar?
+        </div>
+
+      </div>
+
+      <div class="controls">
+
+        <input
+          id="message"
+          type="text"
+          placeholder="Digite sua pergunta..."
+          autocomplete="off"
+        >
+
+        <button id="send">
+          Enviar
+        </button>
+
+      </div>
+
+      <button id="voice">
+        🔊 Testar voz
+      </button>
+
+    </div>
+
+  </div>
+
+  <script>
+    const input = document.getElementById("message");
+    const send = document.getElementById("send");
+    const messages = document.getElementById("messages");
+    const voice = document.getElementById("voice");
+
+    function adicionarMensagem(texto, tipo) {
+      const div = document.createElement("div");
+
+      div.className = "message " + tipo;
+
+      const nome = document.createElement("div");
+      nome.className = "name";
+
+      nome.textContent =
+        tipo === "user"
+          ? "VOCÊ"
+          : "RAPHAEL TENSEI";
+
+      const textoDiv = document.createElement("div");
+      textoDiv.textContent = texto;
+
+      div.appendChild(nome);
+      div.appendChild(textoDiv);
+
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    async function enviarMensagem() {
+
+      const texto = input.value.trim();
+
+      if (!texto) return;
+
+      adicionarMensagem(texto, "user");
+
+      input.value = "";
+
+      send.disabled = true;
+      send.textContent = "Enviando...";
+
+      try {
+
+        const resposta = await fetch("/", {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            message: texto
+          })
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+          throw new Error(
+            dados.reply || "Erro no servidor."
+          );
+        }
+
+        adicionarMensagem(
+          dados.reply || "Não recebi uma resposta.",
+          "raphael"
+        );
+
+      } catch (erro) {
+
+        console.error(erro);
+
+        adicionarMensagem(
+          "Não foi possível conectar com o Raphael.",
+          "raphael"
+        );
+
+      } finally {
+
+        send.disabled = false;
+        send.textContent = "Enviar";
+
+        input.focus();
+      }
+    }
+
+    send.addEventListener("click", enviarMensagem);
+
+    input.addEventListener("keydown", function(event) {
+
+      if (event.key === "Enter") {
+        enviarMensagem();
+      }
+
+    });
+
+    voice.addEventListener("click", function() {
+
+      if (!("speechSynthesis" in window)) {
+        alert("Seu navegador não suporta voz.");
+        return;
+      }
+
+      speechSynthesis.cancel();
+
+      const fala = new SpeechSynthesisUtterance(
+        "Olá. Eu sou Raphael Tensei. Sistema de análise pronto."
+      );
+
+      fala.lang = "pt-BR";
+      fala.rate = 1;
+      fala.pitch = 1;
+
+      speechSynthesis.speak(fala);
+    });
+  </script>
+
+</body>
+</html>
