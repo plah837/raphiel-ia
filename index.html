@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>RAPHAEL TENSEI</title>
 
   <style>
@@ -10,247 +11,113 @@
       box-sizing: border-box;
     }
 
-    html,
     body {
       margin: 0;
-      padding: 0;
-      width: 100%;
-      min-height: 100%;
-      font-family: Arial, sans-serif;
-      background: #05070d;
-      color: white;
-    }
-
-    body {
       min-height: 100vh;
-      overflow-x: hidden;
+      background:
+        radial-gradient(circle at center, #17102d 0%, #090711 45%, #030307 100%);
+      color: white;
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
     }
 
-    .container {
+    .app {
       width: 100%;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 55px 24px 40px;
+      max-width: 650px;
       text-align: center;
     }
 
-    .titulo {
-      margin: 0;
-      font-size: 42px;
-      font-weight: 400;
-      letter-spacing: 10px;
-    }
-
-    .subtitulo {
-      margin-top: 20px;
-      color: #7bdff5;
-      font-size: 25px;
-      font-weight: 300;
-    }
-
-    /* ESFERA DA RAPHAEL */
-    .esfera-area {
-      width: 300px;
-      height: 300px;
-      margin: 70px auto 55px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    /* ESFERA */
+    .sphere {
+      width: 190px;
+      height: 190px;
+      margin: 0 auto 28px;
+      border-radius: 50%;
       position: relative;
+
+      background:
+        radial-gradient(
+          circle,
+          #ffffff 0%,
+          #ffffff 7%,
+          #c8b8ff 13%,
+          #8c5cff 25%,
+          #4d19b8 43%,
+          #17063e 67%,
+          transparent 70%
+        );
+
+      box-shadow:
+        0 0 15px #ffffff,
+        0 0 35px #a96cff,
+        0 0 70px #643cff,
+        0 0 110px #1d8cff;
+
+      animation: pulse 3s ease-in-out infinite;
     }
 
-    .esfera-externa {
-      width: 275px;
-      height: 275px;
-      border-radius: 50%;
-      border: 4px solid #27d9ff;
-      box-shadow:
-        0 0 15px #27d9ff,
-        0 0 35px #27d9ff,
-        0 0 70px rgba(39, 217, 255, 0.65);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .sphere::before {
+      content: "";
       position: absolute;
+      inset: -14px;
+      border-radius: 50%;
+      border: 5px solid #00d9ff;
+
+      box-shadow:
+        0 0 10px #00d9ff,
+        0 0 25px #008cff,
+        inset 0 0 20px #00d9ff;
+
+      opacity: 0.95;
     }
 
-    .esfera-interna {
-      width: 215px;
-      height: 215px;
+    .sphere::after {
+      content: "";
+      position: absolute;
+      inset: 18px;
       border-radius: 50%;
-      border: 4px solid #8070ff;
+      border: 3px solid #b86cff;
+
       box-shadow:
-        0 0 12px #8070ff,
-        0 0 30px rgba(128, 112, 255, 0.8);
-      display: flex;
+        0 0 15px #b86cff,
+        inset 0 0 18px #8c42ff;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.04);
+      }
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      letter-spacing: 5px;
+      font-weight: 700;
+      text-shadow:
+        0 0 10px #ffffff,
+        0 0 25px #9b5cff;
+    }
+
+    .subtitle {
+      margin: 10px 0 25px;
+      color: #b9b1d0;
+      font-size: 15px;
+    }
+
+    .status {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      background: rgba(5, 12, 25, 0.75);
-    }
-
-    .nucleo {
-      width: 94px;
-      height: 94px;
-      border-radius: 50%;
-      background: white;
-      box-shadow:
-        0 0 15px white,
-        0 0 35px #bff7ff,
-        0 0 65px rgba(130, 235, 255, 0.9);
-    }
-
-    .painel {
-      width: 100%;
-      min-height: 590px;
-      border: 2px solid #172a39;
-      border-radius: 30px;
-      padding: 50px 30px;
-      background: rgba(7, 12, 22, 0.7);
-      box-shadow: 0 0 25px rgba(20, 100, 140, 0.12);
-      text-align: left;
-    }
-
-    .mensagem {
-      border-left: 5px solid #25d8ff;
-      border-radius: 24px;
-      background: #101b27;
-      padding: 70px 45px;
-      font-size: 29px;
-      line-height: 1.5;
-      box-shadow: 0 0 20px rgba(37, 216, 255, 0.05);
-    }
-
-    .entrada {
-      margin-top: 30px;
-      width: 100%;
-      min-height: 90px;
-      border: 2px solid #172a39;
-      border-radius: 25px;
-      background: #080d16;
-      color: white;
-      padding: 25px 30px;
-      font-size: 25px;
-      outline: none;
-    }
-
-    .entrada::placeholder {
-      color: #777;
-    }
-
-    .botao {
-      width: 100%;
-      margin-top: 18px;
-      padding: 20px;
-      border: none;
+      gap: 8px;
+      padding: 8px 14px;
       border-radius: 20px;
-      background: #102b3a;
-      color: #6eeaff;
-      font-size: 21px;
-      cursor: pointer;
-    }
-
-    .botao:active {
-      transform: scale(0.98);
-    }
-
-    @media (max-width: 600px) {
-      .container {
-        padding: 55px 24px 35px;
-      }
-
-      .titulo {
-        font-size: 31px;
-        letter-spacing: 7px;
-      }
-
-      .subtitulo {
-        font-size: 23px;
-      }
-
-      .esfera-area {
-        width: 280px;
-        height: 280px;
-        margin-top: 65px;
-      }
-
-      .esfera-externa {
-        width: 275px;
-        height: 275px;
-      }
-
-      .esfera-interna {
-        width: 215px;
-        height: 215px;
-      }
-
-      .painel {
-        min-height: 590px;
-        padding: 50px 30px;
-      }
-
-      .mensagem {
-        padding: 70px 30px;
-        font-size: 28px;
-      }
-
-      .entrada {
-        font-size: 23px;
-      }
-    }
-  </style>
-</head>
-
-<body>
-
-  <main class="container">
-
-    <h1 class="titulo">RAPHAEL TENSEI</h1>
-
-    <div class="subtitulo">
-      Sistema de análise pronto
-    </div>
-
-    <div class="esfera-area">
-      <div class="esfera-externa">
-        <div class="esfera-interna">
-          <div class="nucleo"></div>
-        </div>
-      </div>
-    </div>
-
-    <section class="painel">
-
-      <div class="mensagem">
-        Olá. Eu sou Raphael. Como posso ajudar?
-      </div>
-
-      <input
-        class="entrada"
-        type="text"
-        placeholder="Digite sua pergunta..."
-        id="pergunta"
-      >
-
-      <button class="botao" onclick="enviar()">
-        CONSULTAR RAPHAEL
-      </button>
-
-    </section>
-
-  </main>
-
-  <script>
-    function enviar() {
-      const pergunta = document.getElementById("pergunta").value.trim();
-
-      if (!pergunta) {
-        alert("Digite uma pergunta.");
-        return;
-      }
-
-      alert("Raphael Tensei recebeu sua pergunta.");
-    }
-  </script>
-
-</body>
-</html>
+      background: rgba(0, 255, 180, 0.08);
+      border: 1px solid rgba(0, 255, 180, 0.3);
+      color: #70ffc
