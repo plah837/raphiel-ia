@@ -1,20 +1,19 @@
 export default {
   async fetch(request, env) {
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type"
+    };
 
-    // Permite que o site converse com o servidor
     if (request.method === "OPTIONS") {
       return new Response(null, {
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "POST, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type"
-        }
+        headers: corsHeaders
       });
     }
 
-    // Teste simples
     if (request.method !== "POST") {
-      return resposta("Raphiel IA online.");
+      return json({ reply: "Raphiel IA online." }, corsHeaders);
     }
 
     try {
@@ -22,59 +21,63 @@ export default {
       const pergunta = body.message;
 
       if (!pergunta) {
-        return resposta("Você precisa escrever uma pergunta.");
+        return json(
+          { reply: "Você precisa escrever uma pergunta." },
+          corsHeaders
+        );
       }
 
-      const api = await fetch(
+      const respostaIA = await fetch(
         "https://api.openai.com/v1/responses",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + env.OPENAI_API_KEY
+            "Authorization": `Bearer ${env.OPENAI_API_KEY}`
           },
           body: JSON.stringify({
             model: "gpt-5.6-luna",
             instructions:
-              "Você é Raphiel, uma assistente virtual futurista. Responda em português do Brasil. Seja útil, clara e natural. Você pode conversar sobre assuntos gerais, matemática, programação, jogos, Minecraft, animes, ciência, história e outros assuntos permitidos.",
+              "Você é Raphiel, uma assistente virtual futurista. Responda em português do Brasil. Seja útil, clara, natural e objetiva.",
             input: pergunta
           })
         }
       );
 
-      const data = await api.json();
+      const data = await respostaIA.json();
 
-      if (!api.ok) {
-        console.log(data);
-        return resposta(
-          "Ocorreu um erro ao consultar a inteligência artificial."
+      if (!respostaIA.ok) {
+        console.log("Erro da OpenAI:", data);
+
+        return json(
+          { reply: "A inteligência artificial retornou um erro." },
+          corsHeaders
         );
       }
 
-      return resposta(
-        data.output_text || "Não consegui gerar uma resposta."
+      return json(
+        {
+          reply: data.output_text || "Não consegui gerar uma resposta."
+        },
+        corsHeaders
       );
 
     } catch (erro) {
-      console.log(erro);
+      console.log("Erro:", erro);
 
-      return resposta(
-        "Não consegui me conectar à inteligência artificial."
+      return json(
+        { reply: "Não consegui me conectar à inteligência artificial." },
+        corsHeaders
       );
     }
   }
 };
 
-function resposta(texto) {
-  return new Response(
-    JSON.stringify({
-      reply: texto
-    }),
-    {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*"
-      }
+function json(data, corsHeaders) {
+  return new Response(JSON.stringify(data), {
+    headers: {
+      "Content-Type": "application/json",
+      ...corsHeaders
     }
-  );
+  });
 }
