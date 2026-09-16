@@ -2,14 +2,8 @@
   "name": "raphiel-ia",
   "main": "src/index.js",
   "compatibility_date": "2026-09-16",
-
   "assets": {
     "directory": ".",
     "binding": "ASSETS"
-  },
-
-  "observability": {
-    "enabled": true,
-    "head_sampling_rate": 1
   }
 }
