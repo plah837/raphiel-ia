@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Raphiel IA</title>
+
+  <title>Raphael Tensura</title>
 
   <style>
     * {
@@ -13,28 +14,362 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: #05070d;
+      background: #050b16;
       color: white;
       font-family: Arial, sans-serif;
       display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 700px;
+      height: 100vh;
+      max-height: 900px;
+      display: flex;
       flex-direction: column;
+      background: #07111f;
+      overflow: hidden;
     }
 
     header {
-      padding: 18px;
       text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-      letter-spacing: 2px;
-      color: #8eeaff;
+      padding: 18px;
+      border-bottom: 1px solid #16314d;
     }
 
-    #core-area {
+    header h1 {
+      margin: 0;
+      letter-spacing: 4px;
+      font-size: 25px;
+    }
+
+    .status {
+      margin-top: 5px;
+      color: #6ee7c2;
+      font-size: 12px;
+    }
+
+    /* NÚCLEO */
+
+    #raphael {
+      height: 280px;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 25px 0;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
     }
+
+    .orbit {
+      position: absolute;
+      width: 210px;
+      height: 210px;
+      border: 2px solid rgba(80, 190, 255, .5);
+      border-radius: 50%;
+      animation: rotate 3s linear infinite;
+    }
+
+    .orbit2 {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border: 2px solid rgba(130, 230, 255, .6);
+      border-radius: 50%;
+      animation: rotateReverse 2s linear infinite;
+    }
+
+    .core {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      background: white;
+      box-shadow:
+        0 0 20px 8px rgba(255,255,255,.9),
+        0 0 70px 25px rgba(60,160,255,.5);
+      animation: pulse 1s infinite;
+      z-index: 2;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.2);
+      }
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes rotateReverse {
+      from {
+        transform: rotate(360deg);
+      }
+
+      to {
+        transform: rotate(0deg);
+      }
+    }
+
+    /* CHAT */
+
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+    }
+
+    .message {
+      max-width: 88%;
+      padding: 13px 15px;
+      margin: 10px 0;
+      border-radius: 15px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .ai {
+      background: #102d42;
+      border: 1px solid #205b7a;
+    }
+
+    .user {
+      background: #176fa3;
+      margin-left: auto;
+    }
+
+    /* VOZ */
+
+    .voice {
+      text-align: center;
+      padding: 10px;
+    }
+
+    .voice button {
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: none;
+      background: #35bdf2;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* CAMPO */
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid #16314d;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid #28506d;
+      background: #091827;
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #35bdf2;
+    }
+
+    #send {
+      border: none;
+      border-radius: 12px;
+      padding: 0 18px;
+      background: #35bdf2;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #send:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+
+    <header>
+      <h1>RAPHAEL TENSURA</h1>
+      <div class="status">Sistema online</div>
+    </header>
+
+    <div id="raphael">
+      <div class="orbit"></div>
+      <div class="orbit2"></div>
+      <div class="core"></div>
+    </div>
+
+    <div id="chat">
+
+      <div class="message ai">
+        Olá. Eu sou Raphael Tensura. Como posso ajudar?
+      </div>
+
+    </div>
+
+    <div class="voice">
+      <button onclick="testarVoz()">
+        🔊 Testar voz
+      </button>
+    </div>
+
+    <div class="controls">
+
+      <input
+        id="input"
+        type="text"
+        placeholder="Digite sua pergunta..."
+        autocomplete="off"
+      >
+
+      <button id="send" onclick="enviarMensagem()">
+        Enviar
+      </button>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    /*
+      ENDEREÇO DO SEU WORKER
+    */
+
+    const API_URL =
+      "https://raphiel-ia.luiz2027rocha.workers.dev";
+
+
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("input");
+    const send = document.getElementById("send");
+    const raphael = document.getElementById("raphael");
+
+
+    /*
+      ADICIONAR MENSAGEM
+    */
+
+    function adicionarMensagem(texto, tipo) {
+
+      const div = document.createElement("div");
+
+      div.className = "message " + tipo;
+
+      div.textContent = texto;
+
+      chat.appendChild(div);
+
+      chat.scrollTop = chat.scrollHeight;
+
+      return div;
+    }
+
+
+    /*
+      ENVIAR MENSAGEM PARA O WORKER
+    */
+
+    async function enviarMensagem() {
+
+      const mensagem = input.value.trim();
+
+      if (!mensagem) {
+        return;
+      }
+
+      adicionarMensagem(mensagem, "user");
+
+      input.value = "";
+
+      send.disabled = true;
+      send.textContent = "Pensando...";
+
+      const carregando = adicionarMensagem(
+        "Raphael Tensura está pensando...",
+        "ai"
+      );
+
+      try {
+
+        const resposta = await fetch(API_URL, {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            message: mensagem
+          })
+
+        });
+
+
+        const texto = await resposta.text();
+
+
+        let dados = null;
+
+        try {
+
+          dados = JSON.parse(texto);
+
+        } catch {
+
+          dados = null;
+
+        }
+
+
+        if (!resposta.ok) {
+
+          throw new Error(
+            "Erro HTTP " +
+            resposta.status +
+            ": " +
+            texto
+          );
+
+        }
+
+
+        if (dados && dados.reply) {
+
+          carregando.textContent = dados.reply;
+
+        }
+
+        else if (typeof dados === "string") {
+
+          carregando.textContent = dados    }
 
     #core {
       width: 170px;
