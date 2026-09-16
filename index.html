@@ -1,40 +1,340 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raphiel IA</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Raphiel IA</title>
 
-<style>
-* {
-    box-sizing: border-box;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-body {
-    margin: 0;
-    background: #050b09;
-    color: white;
-    font-family: Arial, sans-serif;
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #05070d;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
 
-.app {
-    width: 100%;
-    max-width: 700px;
-    height: 100vh;
-    margin: auto;
-    display: flex;
-    flex-direction: column;
-    background: linear-gradient(160deg, #07110f, #0b211b);
-}
+    header {
+      padding: 18px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: #8eeaff;
+    }
 
-/* CABEÇALHO */
-header {
-    padding: 18px;
-    text-align: center;
-    border-bottom: 1px solid #21443b;
-}
+    #core-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 25px 0;
+    }
 
-header h1 {
+    #core {
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      border: 3px solid #67e8ff;
+      box-shadow:
+        0 0 15px #67e8ff,
+        0 0 40px #167dff,
+        inset 0 0 30px #167dff;
+      position: relative;
+      animation: pulse 2s infinite;
+    }
+
+    #core::before,
+    #core::after {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border-radius: 50%;
+      border: 2px solid #7df9ff;
+      animation: rotate 5s linear infinite;
+    }
+
+    #core::after {
+      inset: 35px;
+      border-color: #198cff;
+      animation-duration: 3s;
+      animation-direction: reverse;
+    }
+
+    .speaking {
+      animation: speak 0.45s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes speak {
+      from {
+        transform: scale(1);
+        box-shadow:
+          0 0 15px #67e8ff,
+          0 0 40px #167dff,
+          inset 0 0 30px #167dff;
+      }
+      to {
+        transform: scale(1.12);
+        box-shadow:
+          0 0 30px #67e8ff,
+          0 0 70px #167dff,
+          inset 0 0 45px #167dff;
+      }
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #status {
+      text-align: center;
+      color: #8eeaff;
+      margin-bottom: 10px;
+      min-height: 20px;
+    }
+
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      width: 100%;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .message {
+      padding: 12px 15px;
+      margin: 10px 0;
+      border-radius: 14px;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+
+    .user {
+      background: #12365c;
+      text-align: right;
+    }
+
+    .ai {
+      background: #101722;
+      border: 1px solid #1b4c66;
+    }
+
+    #input-area {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      background: #080b13;
+      border-top: 1px solid #172331;
+      position: sticky;
+      bottom: 0;
+    }
+
+    #message {
+      flex: 1;
+      padding: 13px;
+      border-radius: 12px;
+      border: 1px solid #23445b;
+      outline: none;
+      background: #0d121c;
+      color: white;
+      font-size: 16px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 0 17px;
+      background: #167dff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    #voice-test {
+      display: block;
+      margin: 0 auto 10px;
+      padding: 10px 16px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>RAPHIEL IA</header>
+
+  <div id="core-area">
+    <div id="core"></div>
+  </div>
+
+  <div id="status">Sistema online</div>
+
+  <div id="chat">
+    <div class="message ai">
+      Olá. Eu sou Raphiel. Como posso ajudar?
+    </div>
+  </div>
+
+  <button id="voice-test" onclick="testarVoz()">
+    🔊 Testar voz
+  </button>
+
+  <div id="input-area">
+    <input
+      id="message"
+      type="text"
+      placeholder="Digite sua pergunta..."
+      autocomplete="off"
+    >
+
+    <button onclick="enviar()">
+      Enviar
+    </button>
+  </div>
+
+  <script>
+    // Endereço do seu Worker no Cloudflare
+    const API_URL =
+      "https://raphiel-ia.luiz2027rocha.workers.dev";
+
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("message");
+    const core = document.getElementById("core");
+    const status = document.getElementById("status");
+
+    function adicionarMensagem(texto, tipo) {
+      const div = document.createElement("div");
+
+      div.className = "message " + tipo;
+      div.textContent = texto;
+
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function falar(texto) {
+      if (!("speechSynthesis" in window)) {
+        return;
+      }
+
+      speechSynthesis.cancel();
+
+      const voz = new SpeechSynthesisUtterance(texto);
+
+      voz.lang = "pt-BR";
+      voz.rate = 1;
+      voz.pitch = 1;
+
+      voz.onstart = () => {
+        core.classList.add("speaking");
+        status.textContent = "Raphiel está falando...";
+      };
+
+      voz.onend = () => {
+        core.classList.remove("speaking");
+        status.textContent = "Sistema online";
+      };
+
+      speechSynthesis.speak(voz);
+    }
+
+    function testarVoz() {
+      falar(
+        "Olá. Eu sou Raphiel. Sistema de inteligência artificial ativado."
+      );
+    }
+
+    async function enviar() {
+      const texto = input.value.trim();
+
+      if (!texto) {
+        return;
+      }
+
+      adicionarMensagem(texto, "user");
+
+      input.value = "";
+      input.disabled = true;
+
+      status.textContent = "Raphiel está pensando...";
+
+      try {
+        const resposta = await fetch(API_URL, {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            message: texto
+          })
+        });
+
+        const data = await resposta.json();
+
+        if (!resposta.ok) {
+          throw new Error("Erro no servidor");
+        }
+
+        const respostaIA =
+          data.reply || "Não consegui gerar uma resposta.";
+
+        adicionarMensagem(respostaIA, "ai");
+
+        falar(respostaIA);
+
+      } catch (erro) {
+        console.error(erro);
+
+        const mensagem =
+          "Não consegui me conectar ao servidor da Raphiel.";
+
+        adicionarMensagem(mensagem, "ai");
+        falar(mensagem);
+
+      } finally {
+        input.disabled = false;
+        input.focus();
+
+        if (!speechSynthesis.speaking) {
+          status.textContent = "Sistema online";
+        }
+      }
+    }
+
+    input.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        enviar();
+      }
+    });
+  </script>
+
+</body>
+</html>header h1 {
     margin: 0;
     letter-spacing: 4px;
     font-size: 25px;
