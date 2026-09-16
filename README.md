@@ -1,2 +1,336 @@
 # raphiel-ia
 Site estático da Raphiel IA em HTML/CSS/JS para publicação pública no GitHub Pages.
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raphiel IA</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #050b09;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.app {
+    width: 100%;
+    max-width: 700px;
+    height: 100vh;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(160deg, #07110f, #0b211b);
+}
+
+/* CABEÇALHO */
+header {
+    padding: 18px;
+    text-align: center;
+    border-bottom: 1px solid #21443b;
+}
+
+header h1 {
+    margin: 0;
+    letter-spacing: 4px;
+    font-size: 25px;
+}
+
+.status {
+    margin-top: 5px;
+    color: #6ee7c2;
+    font-size: 12px;
+}
+
+/* NÚCLEO DA RAPHIEL */
+#raphael {
+    height: 280px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+#raphael.active {
+    display: flex;
+}
+
+.orbit {
+    position: absolute;
+    width: 210px;
+    height: 210px;
+    border: 2px solid rgba(120,255,220,.35);
+    border-radius: 50%;
+    animation: rotate 3s linear infinite;
+}
+
+.orbit2 {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-radius: 50%;
+    animation: rotateReverse 2s linear infinite;
+}
+
+.core {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: white;
+    box-shadow:
+        0 0 20px 8px rgba(255,255,255,.9),
+        0 0 70px 25px rgba(60,255,190,.5);
+    animation: pulse 1s infinite;
+    z-index: 2;
+}
+
+@keyframes pulse {
+    0%,100% {
+        transform: scale(1);
+        box-shadow:
+            0 0 20px 8px rgba(255,255,255,.8),
+            0 0 60px 20px rgba(60,255,190,.35);
+    }
+
+    50% {
+        transform: scale(1.25);
+        box-shadow:
+            0 0 35px 15px white,
+            0 0 100px 40px rgba(60,255,190,.7);
+    }
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes rotateReverse {
+    from { transform: rotate(360deg); }
+    to { transform: rotate(0deg); }
+}
+
+/* CHAT */
+#chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.message {
+    max-width: 88%;
+    padding: 13px 15px;
+    margin: 10px 0;
+    border-radius: 15px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+}
+
+.ai {
+    background: #12382f;
+    border: 1px solid #286b59;
+}
+
+.user {
+    background: #26332f;
+    margin-left: auto;
+}
+
+/* CAMPO */
+.controls {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid #21443b;
+}
+
+input {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #31574d;
+    background: #0b1916;
+    color: white;
+    font-size: 16px;
+    outline: none;
+}
+
+button {
+    border: none;
+    border-radius: 12px;
+    padding: 0 17px;
+    background: #43b995;
+    color: #06100d;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(.96);
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+    <h1>RAPHIEL IA</h1>
+    <div class="status">Sistema de análise pronto</div>
+</header>
+
+<!-- VISUAL DA RAPHIEL -->
+<div id="raphael">
+    <div class="orbit"></div>
+    <div class="orbit2"></div>
+    <div class="core"></div>
+</div>
+
+<!-- CHAT -->
+<div id="chat"></div>
+
+<!-- CONTROLES -->
+<div class="controls">
+    <input
+        id="input"
+        type="text"
+        placeholder="Digite uma pergunta..."
+        autocomplete="off"
+    >
+
+    <button onclick="sendMessage()">
+        Enviar
+    </button>
+</div>
+
+</div>
+
+<script>
+
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const raphael = document.getElementById("raphael");
+
+function addMessage(text, type) {
+
+    const message = document.createElement("div");
+
+    message.className = "message " + type;
+
+    message.textContent = text;
+
+    chat.appendChild(message);
+
+    chat.scrollTop = chat.scrollHeight;
+}
+
+
+function showRaphael() {
+
+    raphael.classList.add("active");
+
+    setTimeout(() => {
+        raphael.classList.remove("active");
+    }, 3000);
+
+}
+
+
+function getResponse(question) {
+
+    const q = question.toLowerCase();
+
+    if (
+        q.includes("oi") ||
+        q.includes("olá") ||
+        q.includes("ola")
+    ) {
+        return "Olá. Sistema Raphiel pronto. Qual é sua solicitação?";
+    }
+
+    if (q.includes("quem é você") || q.includes("quem e voce")) {
+
+        return "Sou Raphiel IA, uma assistente virtual inspirada no conceito de uma IA conselheira.";
+    }
+
+    if (q.includes("minecraft")) {
+
+        return "Análise concluída. Posso ajudar com Minecraft, comandos, construções, encantamentos e servidores.";
+    }
+
+    if (q.includes("black clover")) {
+
+        return "Posso analisar episódios, personagens, poderes e acontecimentos de Black Clover.";
+    }
+
+    if (
+        q.includes("tensura") ||
+        q.includes("slime") ||
+        q.includes("rimuru")
+    ) {
+
+        return "Tensura detectado. Posso ajudar com Rimuru, habilidades, evoluções e personagens.";
+    }
+
+    if (q.includes("ajuda")) {
+
+        return "Estou pronta. Informe o assunto que deseja analisar.";
+    }
+
+    return "Comando recebido. Analisando sua solicitação. Nesta versão, minhas respostas são locais e pré-programadas.";
+}
+
+
+function sendMessage() {
+
+    const question = input.value.trim();
+
+    if (!question) return;
+
+    addMessage(question, "user");
+
+    input.value = "";
+
+    showRaphael();
+
+    setTimeout(() => {
+
+        const response = getResponse(question);
+
+        addMessage(response, "ai");
+
+        showRaphael();
+
+    }, 700);
+}
+
+
+input.addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+
+        sendMessage();
+
+    }
+
+});
+
+
+addMessage(
+    "Sistema iniciado. Estou pronta para receber seu comando.",
+    "ai"
+);
+
+</script>
+
+</body>
+</html>
